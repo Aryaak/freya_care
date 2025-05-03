@@ -1,10 +1,15 @@
 <?php require_once 'layouts/head.php' ?>
 
 <?php
-require_once 'config/database.php';
-require_once 'config/middleware.php';
+require_once 'config/Database.php';
+require_once 'config/Middleware.php';
 
-guest_only();
+$database = new Database();
+$pdo = $database->getConnection();
+
+$middleware = new Middleware();
+
+$middleware->guestOnly();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim($_POST['name']);
