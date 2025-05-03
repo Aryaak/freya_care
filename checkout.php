@@ -313,7 +313,7 @@ try {
                                 <i class="bx bx-check-circle me-2"></i> Purchase
                             </button>
                             <?php else: ?>
-                            <a href="profile.php" class="btn btn-outline-primary btn-sm">Update Address</a>
+                            <a href="profile.php" class="btn btn-outline-primary btn-sm w-100">Update Address</a>
 
                             <?php endif; ?>
                             
