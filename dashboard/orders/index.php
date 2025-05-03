@@ -1,7 +1,10 @@
 <?php require_once '../../layouts/head.php'; ?>
 
 <?php
-require_once '../../config/database.php';
+require_once '../../config/Database.php';
+
+$database = new Database();
+$pdo = $database->getConnection();
 
 // Fetch all orders with user names
 $stmt = $pdo->query("
