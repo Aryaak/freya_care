@@ -13,7 +13,7 @@ $middleware = new Middleware();
 $middleware->requireAuth();
 
 if (!isset($_GET['id'])) {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit;
 }
 
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("UPDATE items SET category_id = ?, image = ?, name = ?, description = ?, price = ? WHERE id = ?");
         $stmt->execute([$category_id, $image, $name, $description, $price, $id]);
         
-        header("Location: index.php");
+        header("Location: ../index.php");
         exit;
     }
 }
