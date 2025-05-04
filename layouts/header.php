@@ -31,7 +31,7 @@ $middleware->customerOnly();
                         </li>
                         <li><a class="dropdown-item" href="<?= getDomainUrl() . '/logout.php' ?>">Logout</a></li>
                     </ul>
-                    <a href="cart.php" class="btn btn-outline-light ms-3">
+                    <a href="<?= getDomainUrl() . '/cart.php' ?>" class="btn btn-outline-light ms-3">
                         <i class='bx bxs-cart-alt'></i>
                         <?php if(isset($_SESSION['user_id'])): ?>
                         <?php 
