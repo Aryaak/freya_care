@@ -15,7 +15,7 @@ class Middleware {
     }
 
     public static function administratorOnly() {
-        if (isset($_COOKIE['user_role']) || $_COOKIE['user_role'] !== 'administrator') {
+        if (isset($_COOKIE['user_role']) && $_COOKIE['user_role'] !== 'administrator') {
             $host = $_SERVER['HTTP_HOST'];
             header("Location: http://$host");
             exit;
