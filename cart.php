@@ -364,48 +364,53 @@ require_once('layouts/header.php');
         });
 
         document.querySelectorAll('.remove-item').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                const cartItem = this.closest('.cart-item');
-                const cartId = cartItem.dataset.id;
+    btn.addEventListener('click', function () {
+        const cartItem = this.closest('.cart-item');
+        const cartId = cartItem.dataset.id;
+        const storeId = cartItem.querySelector('.item-checkbox').dataset.store;
+        const storeGroup = document.querySelector(`.store-group[data-store-id="${storeId}"]`);
 
-                fetch('cart.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: new URLSearchParams({
-                            action: 'remove_item',
-                            cart_detail_id: cartId
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            cartItem.remove();
-                            updateSelectedItems();
-
-                            // Remove store group if empty
-                            const storeId = cartItem.querySelector('.item-checkbox').dataset
-                                .store;
-                            const storeGroup = document.querySelector(
-                                `.store-group[data-store-id="${storeId}"]`);
-                            if (storeGroup.querySelectorAll('.cart-item').length === 0) {
-                                storeGroup.remove();
-                            }
-
-                            // Show empty cart message if no items left
-                            if (document.querySelectorAll('.cart-item').length === 0) {
-                                document.querySelector('.cart-items-container').innerHTML = `
-                                    <div class="alert alert-info">Your cart is empty. <a href="index.php">Continue shopping</a></div>
-                                `;
-                                document.querySelector('.card').remove();
-                            }
-                        } else {
-                            alert(data.error || 'Failed to remove item.');
+        fetch('cart.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    action: 'remove_item',
+                    cart_detail_id: cartId
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the item
+                    cartItem.remove();
+                    
+                    // Check if this was the last item in the store group
+                    const remainingItems = storeGroup.querySelectorAll('.cart-item');
+                    if (remainingItems.length === 0) {
+                        // Remove the store group
+                        storeGroup.remove();
+                        
+                        // Also check if this was the last store group
+                        const remainingStores = document.querySelectorAll('.store-group');
+                        if (remainingStores.length === 0) {
+                            // Show empty cart message
+                            document.querySelector('.cart-items-container').innerHTML = `
+                                <div class="alert alert-info">Your cart is empty. <a href="index.php">Continue shopping</a></div>
+                            `;
+                            document.querySelector('.card').remove();
                         }
-                    });
+                    }
+                    
+                    // Update the UI
+                    updateSelectedItems();
+                } else {
+                    alert(data.error || 'Failed to remove item.');
+                }
             });
-        });
+    });
+});
     });
 </script>
 
