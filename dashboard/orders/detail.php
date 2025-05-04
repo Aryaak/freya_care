@@ -1,7 +1,7 @@
 <?php
 require_once '../../layouts/head.php';
-require_once '../config/Database.php';
-require_once '../config/Middleware.php';
+require_once '../../config/Database.php';
+require_once '../../config/Middleware.php';
 
 $database = new Database();
 $pdo = $database->getConnection();
