@@ -78,7 +78,7 @@ function sendInvoiceEmail($orderId, $pdo) {
                         <td style="text-align:left; color:'.($order['status'] == 'done' ? '#4CAF50' : '#FF9800').';">'.$order['status'].'</td>
                     </tr>
                     <tr>
-                        <td style="text-align:left; font-weight:bold;">Peyment</td>
+                        <td style="text-align:left; font-weight:bold;">Payment</td>
                         <td style="text-align:left;">'.$order['payment'].'</td>
                     </tr>
                 </table>
