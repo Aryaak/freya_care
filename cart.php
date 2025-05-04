@@ -67,6 +67,8 @@ require_once('layouts/head.php');
 require_once('layouts/header.php');
 ?>
 
+<!-- Previous PHP code remains the same until the cart items display -->
+
 <main role="main">
     <div class="container mt-5">
         <h2>Your Shopping Cart</h2>
@@ -75,51 +77,97 @@ require_once('layouts/header.php');
         <div class="alert alert-info">
             Your cart is empty. <a href="index.php">Continue shopping</a>
         </div>
-        <?php else: ?>
+        <?php else: 
+        // Group items by store
+        $grouped_items = [];
+        foreach ($cart_items as $item) {
+            $store_id = $item['store_id'];
+            if (!isset($grouped_items[$store_id])) {
+                $grouped_items[$store_id] = [
+                    'store_name' => $item['store_name'],
+                    'items' => []
+                ];
+            }
+            $grouped_items[$store_id]['items'][] = $item;
+        }
+        ?>
+
         <div class="row">
             <div class="col-md-8 cart-items-container">
-                <div class="list-group">
-                    <?php foreach ($cart_items as $item): ?>
-                    <div class="list-group-item cart-item" data-id="<?= $item['id'] ?>">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <?php if(!empty($item['image'])): ?>
-                                <img src="<?= htmlspecialchars($item['image']) ?>" class="img-fluid rounded"
-                                    alt="<?= htmlspecialchars($item['name']) ?>">
-                                <?php else: ?>
-                                <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
-                                    style="height: 100px;">
-                                    <span class="text-white">No image</span>
-                                </div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="col-md-6">
-                                <h5><?= htmlspecialchars($item['name']) ?></h5>
-                                <p class="text-muted"><?= htmlspecialchars($item['store_name']) ?></p>
-                                <p class="text-primary item-price" data-price="<?= $item['price'] ?>">
-                                    Rp <?= number_format($item['price'], 0, '.', '.') ?>
-                                </p>
-                                <p class="item-subtotal">
-                                    Subtotal: Rp <span
-                                        class="subtotal-amount"><?= number_format($item['price'] * $item['qty'], 0, '.', '.') ?></span>
-                                </p>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="input-group mb-2">
-                                    <button class="btn btn-outline-secondary qty-minus" type="button">-</button>
-                                    <input type="number" class="form-control qty-input text-center"
-                                        value="<?= $item['qty'] ?>" min="1">
-                                    <button class="btn btn-outline-secondary qty-plus" type="button">+</button>
-                                </div>
-                                <button class="btn btn-outline-danger w-100 remove-item">
-                                    Remove
-                                </button>
-                            </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="select-all-items" checked>
+                        <label class="form-check-label" for="select-all-items">
+                            Select All
+                        </label>
+                    </div>
+                </div>
+
+                <?php foreach ($grouped_items as $store_id => $store_group): ?>
+                <div class="store-group mb-4" data-store-id="<?= $store_id ?>">
+                    <div
+                        class="store-header d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                        <div class="form-check">
+                            <input class="form-check-input store-checkbox" type="checkbox" id="store-<?= $store_id ?>"
+                                data-store-id="<?= $store_id ?>" checked>
+                            <label class="form-check-label fw-bold" for="store-<?= $store_id ?>">
+                                <?= htmlspecialchars($store_group['store_name']) ?>
+                            </label>
                         </div>
                     </div>
-                    <?php endforeach; ?>
+
+                    <div class="list-group">
+                        <?php foreach ($store_group['items'] as $item): ?>
+                        <div class="list-group-item cart-item" data-id="<?= $item['id'] ?>">
+                            <div class="row">
+                                <div class="col-md-1">
+                                    <input type="checkbox" class="form-check-input item-checkbox" checked
+                                        data-id="<?= $item['id'] ?>" data-price="<?= $item['price'] ?>"
+                                        data-qty="<?= $item['qty'] ?>" data-store="<?= $item['store_id'] ?>"
+                                        data-subtotal="<?= $item['price'] * $item['qty'] ?>">
+                                </div>
+                                <div class="col-md-2">
+                                    <?php if(!empty($item['image'])): ?>
+                                    <img src="<?= htmlspecialchars($item['image']) ?>" class="img-fluid rounded"
+                                        alt="<?= htmlspecialchars($item['name']) ?>">
+                                    <?php else: ?>
+                                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
+                                        style="height: 100px;">
+                                        <span class="text-white">No image</span>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5><?= htmlspecialchars($item['name']) ?></h5>
+                                    <p class="text-primary item-price" data-price="<?= $item['price'] ?>">
+                                        Rp <?= number_format($item['price'], 0, '.', '.') ?>
+                                    </p>
+                                    <p class="item-subtotal">
+                                        Subtotal: Rp <span
+                                            class="subtotal-amount"><?= number_format($item['price'] * $item['qty'], 0, '.', '.') ?></span>
+                                    </p>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group mb-2">
+                                        <button class="btn btn-outline-secondary qty-minus" type="button">-</button>
+                                        <input type="number" id="qty-<?= $item['id'] ?>"
+                                            class="form-control qty-input text-center" value="<?= $item['qty'] ?>"
+                                            min="1">
+                                        <button class="btn btn-outline-secondary qty-plus" type="button">+</button>
+                                    </div>
+                                    <button class="btn btn-outline-danger w-100 remove-item">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
+                <?php endforeach; ?>
             </div>
+
+            <!-- Order summary remains the same -->
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
@@ -133,7 +181,7 @@ require_once('layouts/header.php');
                             <span>Total</span>
                             <span>Rp <span class="cart-total"><?= number_format($total, 0, '.', '.') ?></span></span>
                         </div>
-                        <a href="checkout.php" class="btn btn-primary w-100 mt-3 checkout-btn">
+                        <a href="checkout.php" class="btn btn-primary w-100 mt-3 checkout-btn" id="proceed-to-checkout">
                             Proceed to Checkout
                         </a>
                     </div>
@@ -145,100 +193,220 @@ require_once('layouts/header.php');
 </main>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Update quantity via AJAX
-    document.querySelectorAll('.cart-item').forEach(function (itemEl) {
-        const cartId = itemEl.dataset.id;
-        const qtyInput = itemEl.querySelector('.qty-input');
-        const minusBtn = itemEl.querySelector('.qty-minus');
-        const plusBtn = itemEl.querySelector('.qty-plus');
-        const subtotalEl = itemEl.querySelector('.subtotal-amount');
-        const itemPrice = parseInt(itemEl.querySelector('.item-price').dataset.price);
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+        const storeCheckboxes = document.querySelectorAll('.store-checkbox');
+        const selectAllCheckbox = document.getElementById('select-all-items');
+        const checkoutBtn = document.getElementById('proceed-to-checkout');
+        const cartTotal = document.querySelector('.cart-total');
+        const cartCount = document.querySelector('.cart-count');
+        const totalItems = document.querySelector('.total-items');
 
-        function updateQty(newQty) {
-            fetch('cart.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    action: 'update_qty',
-                    cart_detail_id: cartId,
-                    qty: newQty
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    subtotalEl.textContent = new Intl.NumberFormat('id-ID').format(itemPrice * newQty);
-                    document.querySelector('.cart-total').textContent = data.total;
-                    document.querySelector('.cart-count').textContent = data.item_count;
-                    document.querySelector('.total-items').textContent = data.total_items;
-                } else {
-                    alert(data.error || 'Failed to update quantity.');
+        // Function to update selected items and totals
+        function updateSelectedItems() {
+            let selectedItems = [];
+            let newTotal = 0;
+            let itemCount = 0;
+            let productCount = 0;
+
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const id = parseFloat(checkbox.dataset.id);
+                    const price = parseFloat(checkbox.dataset.price);
+                    const qty = parseInt(document.getElementById(`qty-${id}`).value);
+                    const subtotal = price * qty;
+
+                    selectedItems.push(id);
+                    newTotal += subtotal;
+                    itemCount++;
+                    productCount += qty;
                 }
+            });
+
+            // Update UI
+            cartCount.textContent = itemCount;
+            totalItems.textContent = productCount;
+            cartTotal.textContent = new Intl.NumberFormat('id-ID').format(newTotal);
+            checkoutBtn.href = `checkout.php?selected=${selectedItems.join(',')}`;
+            checkoutBtn.disabled = itemCount === 0;
+            checkoutBtn.classList.toggle('disabled', itemCount === 0);
+
+            // Update store checkboxes state
+            updateStoreCheckboxes();
+            updateSelectAllCheckbox();
+        }
+
+        // Function to update store checkboxes based on item selection
+        function updateStoreCheckboxes() {
+            storeCheckboxes.forEach(storeCheckbox => {
+                const storeId = storeCheckbox.dataset.storeId;
+                const storeGroup = document.querySelector(`.store-group[data-store-id="${storeId}"]`);
+                const storeItems = storeGroup.querySelectorAll('.item-checkbox');
+                let allChecked = true;
+                let anyChecked = false;
+
+                storeItems.forEach(item => {
+                    if (!item.checked) allChecked = false;
+                    if (item.checked) anyChecked = true;
+                });
+
+                storeCheckbox.checked = allChecked;
+                storeCheckbox.indeterminate = anyChecked && !allChecked;
             });
         }
 
-        minusBtn.addEventListener('click', () => {
-            let qty = parseInt(qtyInput.value);
-            if (qty > 1) {
-                qtyInput.value = --qty;
-                updateQty(qty);
+
+        // Function to update "Select All" checkbox
+        function updateSelectAllCheckbox() {
+            const allItems = document.querySelectorAll('.item-checkbox');
+            let allChecked = true;
+            let anyChecked = false;
+
+            allItems.forEach(item => {
+                if (!item.checked) allChecked = false;
+                if (item.checked) anyChecked = true;
+            });
+
+            selectAllCheckbox.checked = allChecked;
+            selectAllCheckbox.indeterminate = anyChecked && !allChecked;
+        }
+
+        // Select all items
+        selectAllCheckbox.addEventListener('change', function () {
+            const isChecked = this.checked;
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+            updateSelectedItems();
+        });
+
+        // Select all items in a store
+        storeCheckboxes.forEach(storeCheckbox => {
+            storeCheckbox.addEventListener('change', function () {
+                const storeId = this.dataset.storeId;
+                const isChecked = this.checked;
+                const storeGroup = this.closest('.store-group');
+                const storeItems = storeGroup.querySelectorAll('.item-checkbox');
+
+                storeItems.forEach(item => {
+                    item.checked = isChecked;
+                });
+
+                updateSelectedItems();
+            });
+        });
+        // Update when individual items change
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedItems);
+        });
+
+        // Initial update
+        updateSelectedItems();
+
+        // Quantity update and remove item functions remain the same as before
+        document.querySelectorAll('.cart-item').forEach(function (itemEl) {
+            const cartId = itemEl.dataset.id;
+            const qtyInput = itemEl.querySelector('.qty-input');
+            const minusBtn = itemEl.querySelector('.qty-minus');
+            const plusBtn = itemEl.querySelector('.qty-plus');
+            const subtotalEl = itemEl.querySelector('.subtotal-amount');
+            const itemPrice = parseInt(itemEl.querySelector('.item-price').dataset.price);
+            const checkbox = itemEl.querySelector('.item-checkbox');
+
+            function updateQty(newQty) {
+                fetch('cart.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            action: 'update_qty',
+                            cart_detail_id: cartId,
+                            qty: newQty
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            subtotalEl.textContent = new Intl.NumberFormat('id-ID').format(
+                                itemPrice * newQty);
+                            checkbox.dataset.qty = newQty;
+                            updateSelectedItems();
+                        } else {
+                            alert(data.error || 'Failed to update quantity.');
+                        }
+                    });
             }
-        });
 
-        plusBtn.addEventListener('click', () => {
-            let qty = parseInt(qtyInput.value);
-            qtyInput.value = ++qty;
-            updateQty(qty);
-        });
+            minusBtn.addEventListener('click', () => {
+                let qty = parseInt(qtyInput.value);
+                if (qty > 1) {
+                    qtyInput.value = --qty;
+                    updateQty(qty);
+                }
+            });
 
-        qtyInput.addEventListener('change', () => {
-            let qty = parseInt(qtyInput.value);
-            if (qty >= 1) {
+            plusBtn.addEventListener('click', () => {
+                let qty = parseInt(qtyInput.value);
+                qtyInput.value = ++qty;
                 updateQty(qty);
-            } else {
-                qtyInput.value = 1;
-                updateQty(1);
-            }
-        });
-    });
+            });
 
-    // Remove item
-    document.querySelectorAll('.remove-item').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            const cartItem = this.closest('.cart-item');
-            const cartId = cartItem.dataset.id;
-
-            fetch('cart.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    action: 'remove_item',
-                    cart_detail_id: cartId
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    cartItem.remove();
-                    document.querySelector('.cart-total').textContent = data.total;
-                    document.querySelector('.cart-count').textContent = data.item_count;
-                    document.querySelector('.total-items').textContent = data.total_items;
-
-                    // Optionally show "cart is empty" message
-                    if (document.querySelectorAll('.cart-item').length === 0) {
-                        document.querySelector('.cart-items-container').innerHTML = `
-                            <div class="alert alert-info">Your cart is empty. <a href="index.php">Continue shopping</a></div>
-                        `;
-                        document.querySelector('.card').remove();
-                    }
+            qtyInput.addEventListener('change', () => {
+                let qty = parseInt(qtyInput.value);
+                if (qty >= 1) {
+                    updateQty(qty);
                 } else {
-                    alert(data.error || 'Failed to remove item.');
+                    qtyInput.value = 1;
+                    updateQty(1);
                 }
             });
         });
+
+        document.querySelectorAll('.remove-item').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const cartItem = this.closest('.cart-item');
+                const cartId = cartItem.dataset.id;
+
+                fetch('cart.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            action: 'remove_item',
+                            cart_detail_id: cartId
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            cartItem.remove();
+                            updateSelectedItems();
+
+                            // Remove store group if empty
+                            const storeId = cartItem.querySelector('.item-checkbox').dataset
+                                .store;
+                            const storeGroup = document.querySelector(
+                                `.store-group[data-store-id="${storeId}"]`);
+                            if (storeGroup.querySelectorAll('.cart-item').length === 0) {
+                                storeGroup.remove();
+                            }
+
+                            // Show empty cart message if no items left
+                            if (document.querySelectorAll('.cart-item').length === 0) {
+                                document.querySelector('.cart-items-container').innerHTML = `
+                                    <div class="alert alert-info">Your cart is empty. <a href="index.php">Continue shopping</a></div>
+                                `;
+                                document.querySelector('.card').remove();
+                            }
+                        } else {
+                            alert(data.error || 'Failed to remove item.');
+                        }
+                    });
+            });
+        });
     });
-});
 </script>
 
 <?php require_once('layouts/tail.php'); ?>

@@ -68,6 +68,7 @@ class Cart {
                 i.name, 
                 i.price, 
                 i.image, 
+                s.id as store_id,
                 s.name as store_name
             FROM cart_details cd
             JOIN items i ON cd.item_id = i.id
