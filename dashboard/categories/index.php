@@ -2,12 +2,7 @@
 require_once('../../layouts/head.php');
 require_once('../../layouts/navbar.php');
 require_once '../../config/Database.php';
-require_once '../../config/Middleware.php';
 require_once '../../class/Category.php';
-
-// Check if the user is an admin
-$middleware = new Middleware();
-$middleware->requireAdmin();
 
 // Initialize the database connection
 $database = new Database();
@@ -45,5 +40,9 @@ $categories = $category->getAllCategories();
         </tbody>
     </table>
 </section>
+
+<script>
+    new DataTable('table');
+</script>
 
 <?php require_once('../../layouts/tail.php') ?>

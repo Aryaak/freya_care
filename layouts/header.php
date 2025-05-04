@@ -1,3 +1,13 @@
+<?php 
+// Include middleware using a relative path for better security
+require_once __DIR__ . '/../config/Middleware.php';
+
+// Check if the user is an customer
+$middleware = new Middleware();
+
+$middleware->customerOnly();
+?>
+
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container d-flex justify-content-between">

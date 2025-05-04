@@ -2,14 +2,9 @@
 
 <?php
 require_once '../../config/Database.php';
-require_once '../../config/Middleware.php';
 
 $database = new Database();
 $pdo = $database->getConnection();
-
-$middleware = new Middleware();
-
-$middleware->requireAdmin();
 
 // Fetch all stores with user names
 $stmt = $pdo->query("
@@ -57,5 +52,10 @@ $stores = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </tbody>
 </table>
 </section>
+
+<script>
+    new DataTable('table');
+</script>
+
 
 <?php require_once '../../layouts/tail.php'; ?>

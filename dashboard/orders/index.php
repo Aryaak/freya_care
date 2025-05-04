@@ -55,4 +55,9 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 </section>
 
+<script>
+    new DataTable('table');
+</script>
+
+
 <?php require_once '../../layouts/tail.php'; ?>

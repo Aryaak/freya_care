@@ -14,10 +14,18 @@ class Middleware {
         }
     }
 
-    public static function requireAdmin() {
-        if (!isset($_COOKIE['user_role']) || $_COOKIE['user_role'] !== 'administrator') {
+    public static function administratorOnly() {
+        if (isset($_COOKIE['user_role']) || $_COOKIE['user_role'] !== 'administrator') {
             $host = $_SERVER['HTTP_HOST'];
             header("Location: http://$host");
+            exit;
+        }
+    }
+
+    public static function customerOnly() {
+        if (isset($_COOKIE['user_role']) && $_COOKIE['user_role'] !== 'customer') {
+            $host = $_SERVER['HTTP_HOST'];
+            header("Location: http://$host/dashboard");
             exit;
         }
     }
